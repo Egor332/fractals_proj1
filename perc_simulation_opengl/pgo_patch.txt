@@ -1,0 +1,6 @@
+1d0
+< rm -f *gcda
+11c10
+< -fprofile-generate \
+---
+> -fprofile-use \
