@@ -165,31 +165,6 @@ int update_callback(int pause, uint32_t* pixels_in, struct Context* cx) {
         }
     }
     
-
-    /*    
-    float* prob = vert_connection_prob;
-    DsufNode* up = uf;
-    for (; prob < vert_connection_prob+width*(height-1); ++prob, ++up) {
-        if (*prob < lvl) {
-            DsufNode* restrict a = up;
-            DsufNode* restrict b = up + width;
-            ds_union(a, b);
-        }
-    }
-
-    for (size_t y = 0; y < height; ++y) {
-        float* prob = horiz_connection_prob+y*width;
-        DsufNode* up = uf+y*width;
-        for (; prob < horiz_connection_prob+(y+1)*width-1; ++prob, ++up) {
-            if (*prob < lvl) {
-                DsufNode* restrict a = up;
-                DsufNode* restrict b = up + 1;
-                ds_union(a, b);
-            }
-        }
-    }
-    */
-
 #ifdef PP_UNIX
     size_t n = width*height;
 
