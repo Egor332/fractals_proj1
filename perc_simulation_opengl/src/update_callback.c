@@ -9,12 +9,11 @@
 #include <stdarg.h>
 #include <string.h>
 
-#ifdef PP_UNIX
-
 inline void assign_3_4(uint32_t* x, uint32_t y) {
     *x = y;
 }
 
+#ifdef PP_UNIX
 void* thread_func(void* void_args) {
     ThreadArgs* args = void_args;
     while (1) {
@@ -41,7 +40,6 @@ void* thread_func(void* void_args) {
     }
     return NULL;
 }
-
 #endif
 
 int init_callback(uint32_t* pixels, struct Context* cx) {
