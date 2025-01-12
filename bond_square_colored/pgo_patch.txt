@@ -1,8 +1,0 @@
-1d0
-< rm -f *gcda
-10c9
-< -fprofile-generate \
----
-> -fprofile-use \
-17a17
-> rm -f *gcda

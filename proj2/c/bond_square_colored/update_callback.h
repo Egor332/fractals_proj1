@@ -2,8 +2,8 @@
 #define UPDATE_CALLBACK_H
 #include <stddef.h>
 #include <stdint.h>
-#include "union_find_aos.h"
-#include "config.h"
+#include <union_find_aos.h>
+#include <perc_config.h>
 
 #ifdef PP_UNIX
 #include <pthread.h>

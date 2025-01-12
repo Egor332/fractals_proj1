@@ -1,6 +1,6 @@
 // Draft tests for percolation in 2D grid
 
-#include "mt_random.h"
+#include <mt_random.h>
 #include <stdio.h>
 #include <stdlib.h>
 

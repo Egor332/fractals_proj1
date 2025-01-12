@@ -1,4 +1,4 @@
-#include <glad/glad.h>  
+#include <glad.h>  
 #include <GLFW/glfw3.h> 
 #include <stdlib.h>     
 #include "update_callback.h"

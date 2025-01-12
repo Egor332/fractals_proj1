@@ -1,6 +1,5 @@
-rm -f *gcda
 gcc \
-src/*.c \
+*.c ../lib/*.c \
 -O3 \
 -flto \
 -ffast-math \
@@ -12,5 +11,5 @@ src/*.c \
 -Wall \
 -Wstrict-aliasing \
 -std=c99 \
--o perc \
--lglfw -lpthread -I src/glad/include
+-o main \
+-lglfw -lpthread -I ../lib/

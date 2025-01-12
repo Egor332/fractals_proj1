@@ -1,11 +1,11 @@
 #include "update_callback.h"
-#include "union_find_aos.h"
+#include <union_find_aos.h>
 #include <errno.h>
 #include <netinet/in.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "config.h"
+#include <perc_config.h>
 #include <stdarg.h>
 #include <string.h>
 
