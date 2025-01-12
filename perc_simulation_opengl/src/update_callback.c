@@ -16,6 +16,11 @@ inline void assign_3_4(uint32_t* x, uint32_t y) {
 #ifdef PP_UNIX
 void* thread_func(void* void_args) {
     ThreadArgs* args = void_args;
+    size_t first = args->first;
+    size_t last_exc = first + args->n;
+    uint32_t* restrict color = args->cx->color;
+    uint32_t* restrict pixels = args->pixels;
+    DsufNode* uf = args->cx->uf;
     while (1) {
         if (sem_wait(&args->semaphore_in) == -1) {
             return NULL;
@@ -23,19 +28,14 @@ void* thread_func(void* void_args) {
         if (args->finish) {
             return NULL;
         }
-
-        size_t first = args->first;
-        size_t last_exc = first + args->n;
-        uint32_t* restrict color = args->cx->color;
-        uint32_t* restrict pixels = args->pixels;
-        DsufNode* uf = args->cx->uf;
-        for (size_t i = first; i < last_exc; ++i) {
-            DsufNode* node = ds_lazy_find(&uf[i]); 
-            uint32_t* restrict pixel = &pixels[i];
+        uint32_t* px = &pixels[first];
+        DsufNode* ufp = &uf[first];
+        for (; px < pixels+last_exc; ++px, ++ufp) {
+            DsufNode* node = ds_lazy_find(ufp); 
+            uint32_t* restrict pixel = px;
             uint32_t* restrict col = &color[node - uf];
             assign_3_4(pixel, *col);
         }
-
         (void)sem_post(&args->semaphore_out);
     }
     return NULL;
@@ -144,6 +144,7 @@ int update_callback(int pause, uint32_t* pixels_in, struct Context* cx) {
 
     float lvl = update_level(cx->level);
 
+    
     for (size_t y = 0; y < height-1; ++y) {
         for (size_t x = 0; x < width; ++x) {
             if (vert_connection_prob[x+y*width] < lvl) {
@@ -163,6 +164,31 @@ int update_callback(int pause, uint32_t* pixels_in, struct Context* cx) {
             }
         }
     }
+    
+
+    /*    
+    float* prob = vert_connection_prob;
+    DsufNode* up = uf;
+    for (; prob < vert_connection_prob+width*(height-1); ++prob, ++up) {
+        if (*prob < lvl) {
+            DsufNode* restrict a = up;
+            DsufNode* restrict b = up + width;
+            ds_union(a, b);
+        }
+    }
+
+    for (size_t y = 0; y < height; ++y) {
+        float* prob = horiz_connection_prob+y*width;
+        DsufNode* up = uf+y*width;
+        for (; prob < horiz_connection_prob+(y+1)*width-1; ++prob, ++up) {
+            if (*prob < lvl) {
+                DsufNode* restrict a = up;
+                DsufNode* restrict b = up + 1;
+                ds_union(a, b);
+            }
+        }
+    }
+    */
 
 #ifdef PP_UNIX
     size_t n = width*height;
@@ -173,22 +199,26 @@ int update_callback(int pause, uint32_t* pixels_in, struct Context* cx) {
 
     const size_t chunk_size = n / (THREAD_COUNT+1);
 
-    for (size_t i = chunk_size*THREAD_COUNT; i < n; ++i) {
-        DsufNode* node = ds_lazy_find(&uf[i]);
-        uint32_t* restrict pixel = &pixels[i];
+    uint32_t* px = &pixels[chunk_size*THREAD_COUNT];
+    DsufNode* ufp = &uf[chunk_size*THREAD_COUNT];
+    for (; px < pixels+n; ++px, ++ufp) {
+        DsufNode* node = ds_lazy_find(ufp); 
+        uint32_t* restrict pixel = px;
         uint32_t* restrict col = &color[node - uf];
         assign_3_4(pixel, *col);
     }
-
+ 
     for (size_t i = 0; i < THREAD_COUNT; ++i) {
         CALL_RETRY(sem_wait(&cx->thread_args[i].semaphore_out));
     }
      
 #else
 
-    for (size_t i = 0; i < width*height; ++i) {
-        DsufNode* node = ds_find(&uf[i]);
-        uint32_t* restrict pixel = &pixels[i];
+    uint32_t* px = pixels;
+    DsunNode* ufp = uf;
+    for (; px < pixels+width*height; ++px, ++ufp) {
+        DsufNode* node = ds_lazy_find(ufp); 
+        uint32_t* restrict pixel = px;
         uint32_t* restrict col = &color[node - uf];
         assign_3_4(pixel, *col);
     }
