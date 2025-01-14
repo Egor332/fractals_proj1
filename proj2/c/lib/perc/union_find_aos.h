@@ -1,7 +1,7 @@
 #ifndef UNION_FIND_H
 #define UNION_FIND_H
 
-#include <perc_config.h>
+#include <global_config.h>
 #include <stddef.h>
 
 typedef struct DsufNode_ {

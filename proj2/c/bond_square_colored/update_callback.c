@@ -5,11 +5,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <perc_config.h>
 #include <stdarg.h>
 #include <string.h>
 
-inline void assign_3_4(uint32_t* x, uint32_t y) {
+void assign_3_4(uint32_t* x, uint32_t y) {
     *x = y;
 }
 

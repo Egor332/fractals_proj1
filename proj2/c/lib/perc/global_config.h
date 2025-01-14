@@ -1,5 +1,5 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef PERC_GLOBAL_CONFIG_H
+#define PERC_GLOBAL_CONFIG_H
 
 /* https://stackoverflow.com/questions/7063303/macro-unix-not-defined-in-macos-x */
 #if defined(__unix__) || defined(__unix) || defined(unix)
@@ -9,16 +9,15 @@
 /* CPU specific */
 #define THREAD_COUNT (8-1)
 
-/* nr of samples */
-#define PERC_MAX_LVL 1500
-
 /* quality */
-#define WORLD_WIDTH 1920
-#define WORLD_HEIGHT 1080
+#define SCR_WIDTH 1920
+#define SCR_HEIGHT 1080
+
+#define GL_MAJOR 3
+#define GL_MINOR 3
 
 /* no impact on performance */
-/*#define DSUF_HALVE
-*/
+#define DSUF_HALVE
 
 /* recommended due to color smoothness */
 #define DSUF_RANK
