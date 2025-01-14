@@ -3,14 +3,18 @@
 #include <shader.h>
 #include <camera.h>
 #include <GLFW/glfw3.h>
+#include "update_callback.h"
 
 #define SHADER_VERT \
-"#version 330 core                          \n" \
+"#version "PERC_STRING(GL_MAJOR)""PERC_STRING(GL_MINOR)"0 core                          \n" \
 "layout (location = 0) in vec3 aPos;        \n" \
 "layout (location = 1) in vec3 aNormal;     \n" \
+"layout (location = 2) in ivec3 instancePos;                                             " \
+"layout (location = 3) in int instanceColor;                                             " \
 "                                             " \
 "out vec3 FragPosView;                        " \
 "out vec3 Normal;                             " \
+"flat out int Color;                                             " \
 "                                             " \
 "uniform mat4 model;                          " \
 "uniform mat4 view;                           " \
@@ -19,23 +23,24 @@
 "                                             " \
 "void main()                                  " \
 "{                                            " \
-"    vec4 worldPos = model * vec4(aPos, 1.0); " \
+"    vec4 worldPos = model * vec4(aPos + vec3(instancePos), 1.0); " \
 "    vec4 viewPos = view * worldPos;          " \
 "    FragPosView = vec3(viewPos);             " \
 "    Normal = normViewModelMatrix * aNormal;  " \
+"    Color = instanceColor;                                         " \
 "    gl_Position = projection * viewPos;      " \
 "}                                            "
 
 #define SHADER_FRAG \
-"#version 330 core                                                    \n" \
+"#version "PERC_STRING(GL_MAJOR)""PERC_STRING(GL_MINOR)"0 core                                                    \n" \
 "#define light_ambientLightColor vec3(0.1, 0.1, 0.1)                  \n" \
-"#define light_diffuseLightColor vec3(0.5, 0.5, 0.5)                  \n" \
 "#define light_specularLightColor vec3(0.5, 0.5, 0.5)                 \n" \
 "                                                                       " \
 "uniform vec3 light_lightPosView;                                       " \
 "                                                                       " \
 "out vec4 FragColor;                                                    " \
 "                                                                       " \
+"flat in int Color;                                                                       " \
 "in vec3 Normal;                                                        " \
 "in vec3 FragPosView;                                                   " \
 "                                                                       " \
@@ -52,7 +57,7 @@
 "    vec3 lightDir   = normalize(light_lightPosView - fragPosView);     " \
 "    float diff      = max(dot(normal, lightDir), 0.0);                 " \
 "    float dist      = length(light_lightPosView - fragPosView);        " \
-"    vec3 diffuse    = light_diffuseLightColor * diff;                  " \
+"    vec3 diffuse    = vec3(0.5 - 0.5 * Color, 0.5, 0.5) * diff;                  " \
 "    diffuse         = diffuse * get_attenuation(dist);                 " \
 "    return            diffuse;                                         " \
 "}                                                                      " \
@@ -84,7 +89,7 @@
 "                                                                       " \
 "    vec3 ambient = vec3(0.0);                                          " \
 "                                                                       " \
-"    ambient = ambient + light_ambientLightColor;                       " \
+"    ambient = light_ambientLightColor * vec3(1.0 - Color, 1.0, 1.0);                       " \
 "                                                                       " \
 "    vec3 diffuse_result = vec3(0.0);                                   " \
 "    diffuse_result += calc_diffuse_point_light(norm,                   " \
@@ -134,6 +139,8 @@ void normMatrix(mat4 mx, mat3 dest) {
 
 GlobalAttributes* callback_attributes = NULL;
 
+
+
 int main()
 {
     GlobalAttributes attr;
@@ -151,6 +158,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GL_MAJOR);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_MINOR);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwSwapInterval(1);
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -176,7 +184,6 @@ int main()
         glfwTerminate();
         return EXIT_FAILURE;
     }
-
 
     glEnable(GL_DEPTH_TEST);
     //glEnable(GL_CULL_FACE);
@@ -243,10 +250,45 @@ int main()
     glEnableVertexAttribArray(1);
 
 
+
+    ivec4 positions[100];
+
+    for (size_t i = 0; i < 100; ++i) {
+        positions[i][0] = i;
+        positions[i][1] = i;
+        positions[i][2] = i;
+        positions[i][3] = (i < 50);
+    }
+
+    unsigned int instanceVBO;
+    glGenBuffers(1, &instanceVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(ivec4) * 100, positions, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glEnableVertexAttribArray(2);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(ivec4), (void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glVertexAttribDivisor(2, 1);
+
+    glEnableVertexAttribArray(3);
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(ivec4), (void*)sizeof(ivec3));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glVertexAttribDivisor(3, 1);
+
+    
+
+
     GLuint shd;
     shd_init(&shd, SHADER_VERT, SHADER_FRAG, NULL);
 
     glUseProgram(shd);
+
+    size_t n_to_draw;
+    PercContext cx;
+    (void)init_callback(positions, &n_to_draw, &cx);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -303,7 +345,14 @@ int main()
                     "normViewModelMatrix"), 1, GL_FALSE, (float*)norm);
         
         glBindVertexArray(cubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+        size_t first_to_update;
+        size_t n_to_update;
+        (void)update_callback(positions, &n_to_draw, &first_to_update, &n_to_update, &cx);
+
+        glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+        glBufferSubData(GL_ARRAY_BUFFER, first_to_update * sizeof(ivec4), n_to_update * sizeof(ivec4), positions + first_to_update);
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 36, n_to_draw);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
