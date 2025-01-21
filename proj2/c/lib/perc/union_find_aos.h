@@ -11,6 +11,6 @@ typedef struct DsufNode_ {
 
 DsufNode* ds_find(DsufNode* p);
 DsufNode* ds_lazy_find(DsufNode* p);
-void ds_union(DsufNode* restrict a_in, DsufNode* restrict b_in);
+DsufNode* ds_union(DsufNode* restrict a_in, DsufNode* restrict b_in);
 
 #endif

@@ -23,12 +23,12 @@ DsufNode* ds_lazy_find(DsufNode* p) {
     return p;
 }
 
-void ds_union(DsufNode* restrict a_in, DsufNode* restrict b_in) {
+DsufNode* ds_union(DsufNode* restrict a_in, DsufNode* restrict b_in) {
     DsufNode* a_tmp = ds_find(a_in);
     DsufNode* b_tmp = ds_find(b_in);
 
     if (a_tmp == b_tmp)
-        return;
+        return a_tmp;
 
     if (a_tmp->rank_size < b_tmp->rank_size) {
         DsufNode* tmp = a_tmp;
@@ -50,5 +50,7 @@ void ds_union(DsufNode* restrict a_in, DsufNode* restrict b_in) {
     a->rank_size += b->rank_size;
 #endif
     
+    return a;
+
     }
 }
