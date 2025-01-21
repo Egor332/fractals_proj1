@@ -90,6 +90,8 @@ int init_callback(struct Vertex* vertices, size_t width, size_t height, size_t v
     size_t n = width*height;
     const size_t chunk_size = n / (THREAD_COUNT+1);
 
+#ifdef PP_UNIX
+
     ThreadArgs* thread_args = cx->thread_args;
     for (size_t i = 0; i < THREAD_COUNT; ++i) {
         thread_args[i].first = chunk_size * i;
@@ -106,6 +108,8 @@ int init_callback(struct Vertex* vertices, size_t width, size_t height, size_t v
             goto FAILED;
         }
     }
+
+#endif
 
     return 1;
 FAILED:

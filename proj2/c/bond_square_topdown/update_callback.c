@@ -1,8 +1,5 @@
 #include "update_callback.h"
 #include <union_find_aos.h>
-#include <errno.h>
-#include <netinet/in.h>
-#include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -80,7 +77,7 @@ int init_callback(uint32_t* pixels, struct Context* cx) {
     /* cover top */
     for (size_t x = 0; x < WORLD_WIDTH; ++x) {
         ((uint8_t*)color)[(x+0*width)*4+0] = 0;
-        ((uint8_t*)color)[(x+0*width)*4+1] = 0x42;
+        ((uint8_t*)color)[(x+0*width)*4+1] = 0;
         ((uint8_t*)color)[(x+0*width)*4+2] = 0;
     }
 
@@ -214,7 +211,7 @@ int update_callback(int pause, uint32_t* pixels_in, struct Context* cx) {
 #else
 
     uint32_t* px = pixels;
-    DsunNode* ufp = uf;
+    DsufNode* ufp = uf;
     for (; px < pixels+width*height; ++px, ++ufp) {
         DsufNode* node = ds_lazy_find(ufp); 
         uint32_t* restrict pixel = px;

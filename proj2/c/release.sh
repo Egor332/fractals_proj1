@@ -11,6 +11,7 @@ gcc \
 -march=native \
 -mtune=native \
 -Wall \
+-Werror=vla \
 -Wstrict-aliasing \
 -pipe \
 -std=c99 \

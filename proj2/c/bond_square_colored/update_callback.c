@@ -189,7 +189,7 @@ int update_callback(int pause, uint32_t* pixels_in, struct Context* cx) {
 #else
 
     uint32_t* px = pixels;
-    DsunNode* ufp = uf;
+    DsufNode* ufp = uf;
     for (; px < pixels+width*height; ++px, ++ufp) {
         DsufNode* node = ds_lazy_find(ufp); 
         uint32_t* restrict pixel = px;

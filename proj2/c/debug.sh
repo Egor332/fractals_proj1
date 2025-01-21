@@ -8,6 +8,7 @@ gcc \
 -march=native \
 -mtune=native \
 -Wstrict-aliasing \
+-Werror=vla \
 -pipe \
 -std=c99 \
 -o main \

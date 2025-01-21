@@ -6,6 +6,9 @@
 #include "local_config.h"
 
 #ifdef PP_UNIX
+#include <errno.h>
+#include <netinet/in.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
 #endif

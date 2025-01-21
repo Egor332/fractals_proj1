@@ -2,8 +2,14 @@
 #include <GLFW/glfw3.h> 
 #include <stdlib.h>     
 #include "update_callback.h"
+#include <time.h>
 
 int main() {
+
+#ifdef PERC_ENABLE_RANDOM
+    srand(time(NULL));
+#endif
+
     uint32_t* pixels;
     GLFWwindow* window;
 
