@@ -1,0 +1,21 @@
+\section{Opis algorytmów}
+
+\subsection{Algorytm obliczania rozmiaru multigrafu}
+\begin{algorithm}[H]
+\caption{Obliczanie rozmiaru multigrafu}
+\begin{algorithmic}[1]
+\Require \( G = (V, E) \) - multigraf reprezentowany przez macierz sąsiedztwa \( A \)
+\Ensure Rozmiar multigrafu \( |E| \)
+\State \( |E| \gets 0 \)
+\ForEach{wierzchołki \( i, j \) w \( V \)}
+    \State \( |E| \gets |E| + A[i][j] \)
+\EndFor
+\State \Return \( |E| \)
+\end{algorithmic}
+\end{algorithm}
+
+Złożoność obliczeniowa algorytmu wynosi \( O(n^2) \), gdzie \( n \) to liczba wierzchołków w multigrafie. Wynika to z iteracji po całej macierzy sąsiedztwa \( A \) o wymiarach \( n \times n \).
+
+\subsection{Podsumowanie}
+
+xxx
